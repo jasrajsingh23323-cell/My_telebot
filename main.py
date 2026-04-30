@@ -1,64 +1,44 @@
 import asyncio
-from pyrogram import Client, filters
+from pyrogram import Client, filters, idle
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest
 from flask import Flask
 from threading import Thread
 import os
 
-# --- 1. रेंडर के लिए वेब सर्वर (ताकि बॉट 24/7 चले) ---
+# --- 1. रेंडर के लिए वेब सर्वर ---
 app_server = Flask('')
 @app_server.route('/')
 def home(): 
     return "Bot is Running!"
 
-def run():
+def run_flask():
     app_server.run(host='0.0.0.0', port=os.environ.get('PORT', 8080))
 
 # --- 2. अपनी डिटेल्स यहाँ भरें ---
-API_ID = 39834295               # अपना API ID यहाँ लिखें
-API_HASH = "0a904deff6494ef8d2369afdcb9c3991"         # अपना API Hash यहाँ लिखें
-BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"       # अपना बॉट टोकन यहाँ लिखें
-CHANNEL_LINK = "https://t.me/+sUs1C78-PURmYmRl" # चैनल लिंक
+API_ID =      39834295          # असली ID डालें
+API_HASH = "0a904deff6494ef8d2369afdcb9c3991"         # असली Hash डालें
+BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"       # असली टोकन डालें
+CHANNEL_LINK = "https://t.me/+sUs1C78-PURmYmRl" 
 
-# --- 3. फाइल ID (अभी खाली छोड़ दें, बाद में Logs से निकालकर यहाँ भरें) ---
+# फाइल ID (अभी खाली रहने दें)
 VIDEO_1 = "ID_AAYEGI_YAHA"
 VIDEO_2 = "ID_AAYEGI_YAHA"
 PHOTOS = ["PHOTO_ID_1", "PHOTO_ID_2", "PHOTO_ID_3"]
 
 app = Client("my_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-# जॉइन रिक्वेस्ट आने पर वीडियो भेजने वाला फंक्शन
 @app.on_chat_join_request()
 async def join_handler(client, request: ChatJoinRequest):
     user_id = request.from_user.id
-    buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("↗️ Share", url="https://t.me/share/url?url=Join%20Now!")],
-        [InlineKeyboardButton("⏩ Skip Share", callback_data="skip_share")]
-    ])
     try:
         m1 = await client.send_video(user_id, VIDEO_1)
         m2 = await client.send_video(user_id, VIDEO_2)
-        m3 = await client.send_message(user_id, "आपका स्वागत है! यहाँ आपके वीडियो हैं।", reply_markup=buttons)
-        
-        await asyncio.sleep(180) # 3 मिनट बाद मैसेज डिलीट
+        await asyncio.sleep(180)
         await m1.delete()
         await m2.delete()
-        await m3.delete()
     except Exception as e:
         print(f"Join Error: {e}")
 
-# स्टार्ट कमांड और फोटो भेजने वाला फंक्शन
-@app.on_message(filters.command("start"))
-async def start_cmd(client, message):
-    try:
-        for p in PHOTOS:
-            await client.send_photo(message.chat.id, p)
-        await client.send_message(message.chat.id, "जुड़ने के लिए नीचे क्लिक करें:", 
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Join Channel", url=CHANNEL_LINK)]]))
-    except Exception as e:
-        print(f"Start Error: {e}")
-
-# --- 4. फाइल ID निकालने वाला खास हिस्सा (इसे ध्यान से देखें) ---
 @app.on_message(filters.video | filters.photo)
 async def get_ids(client, message):
     if message.video:
@@ -66,16 +46,16 @@ async def get_ids(client, message):
     elif message.photo:
         print(f"PHOTO_ID_MIL_GAYI: {message.photo.file_id}")
 
-@app.on_callback_query(filters.regex("skip_share"))
-async def skip(client, cb):
-    await start_cmd(client, cb.message)
-    await cb.answer()
+# --- 3. सबसे सुरक्षित RUN तरीका ---
+async def main():
+    # Flask चालू करें
+    Thread(target=run_flask).start()
+    
+    # बॉट चालू करें
+    await app.start()
+    print("✅ BOT STARTED SUCCESSFULLY!")
+    await idle() # बॉट को चालू रखेगा
+    await app.stop()
 
 if __name__ == "__main__":
-    # Flask को अलग थ्रेड में चलाएं
-    Thread(target=run).start()
-    
-    # Pyrogram को चलाने का सही तरीका (नया तरीका)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(app.run())
-
+    asyncio.run(main())
