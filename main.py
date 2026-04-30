@@ -1,14 +1,14 @@
-  import asyncio
+import asyncio
 import os
 from threading import Thread
 from flask import Flask
-from pyrogram import Client, filters, idle
+from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest
 
-# --- Flask Server for Render ---
+# --- Flask Server for Render (24/7 Active) ---
 app_server = Flask('')
 @app_server.route('/')
-def home(): return "Bot is Running!"
+def home(): return "Bot is Running Successfully!"
 
 def run_flask():
     port = int(os.environ.get("PORT", 10000))
@@ -19,21 +19,23 @@ API_ID = 39834295
 API_HASH = "0a904deff6494ef8d2369afdcb9c3991"
 BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"
 
-# --- Paste Your IDs Here ---
-V1 = "BAACAgIAAxkBAAIFiGZInh8l8m_v7_7_7_7_7_7_7_7" # अपनी आईडी डालें
-V2 = "BAACAgIAAxkBAAIFimZInh8l8m_v7_7_7_7_7_7_7_7" 
-P1 = "AgACAgIAAxkBAAIFjGZInh8l8m_v7_7_7_7_7_7_7_7"
-P2 = "AgACAgIAAxkBAAIFjmZInh8l8m_v7_7_7_7_7_7_7_7"
-P3 = "AgACAgIAAxkBAAIFkGZInh8l8m_v7_7_7_7_7_7_7_7"
+# --- Your Verified File IDs ---
+V1 = "AAMCBQADGQEAAw5p8yAeZNIvMd7oUNV9CaOAGLy0KAACEiAAAtx3eFdehydOds-QDwEAB20AAzsE"
+V2 = "AAMCBQADGQEAAxBp8yYkuqKyftOj9xbSHl3Rf10abQACEyAAAtx3eFeUUF8xraNAxQEAB20AAzsE"
+P1 = "AgACAgUAAxkBAAMWafNGlvjLmUudTDebqbs-HmwG8WoAAjYSaxsmVplX4dWyKUtAH1sBAAMCAAN5AAM7BA"
+P2 = "AgACAgUAAxkBAAMXafNHE59gwTscf5xvbkghqNJl1cEAAjcSaxsmVplX6CwxVMWINnMBAAMCAAN5AAM7BA"
+P3 = "AgACAgUAAxkBAAMYafNHStJCSFlsJpHt86mp8RBbw6EAAjgSaxsmVplXCHaVIk9KEUEBAAMCAAN5AAM7BA"
 
 app = Client("jaw_code_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
+# --- Auto Delete Logic (120 Seconds) ---
 async def auto_delete(messages):
-    await asyncio.sleep(120) # 2 मिनट
+    await asyncio.sleep(120)
     for msg in messages:
         try: await msg.delete()
         except: pass
 
+# --- Join Request Handler ---
 @app.on_chat_join_request()
 async def join_req(client, request: ChatJoinRequest):
     user = request.from_user
@@ -47,6 +49,7 @@ async def join_req(client, request: ChatJoinRequest):
     msg3 = await client.send_message(user.id, f"{name}\nNO ACCESS CHANELL!\n\nYOU CAN FIX IT 😏\n\nSHARE TO 2 GROUPS TO OPEN\n-- 0/2 (61.625 + VID) --", reply_markup=btns)
     asyncio.create_task(auto_delete([msg1, msg2, msg3]))
 
+# --- Start Command Logic ---
 async def send_start_content(client, chat_id):
     btns = InlineKeyboardMarkup([[InlineKeyboardButton("Waiting for u daddy❤️💕", callback_data="buy")]])
     m1 = await client.send_photo(chat_id, P1)
@@ -63,9 +66,12 @@ async def start(client, message):
 async def cb(client, callback):
     if callback.data == "start_msg":
         await send_start_content(client, callback.message.chat.id)
+        await callback.answer()
     elif callback.data == "buy":
         await callback.answer("Buy it daddy i m waiting for u", show_alert=True)
 
 if __name__ == "__main__":
     Thread(target=run_flask).start()
+    print("✅ BOT IS LIVE!")
     app.run()
+  
