@@ -5,7 +5,7 @@ from flask import Flask
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest, InputMediaVideo, InputMediaPhoto
 
-# --- Flask Server for Render (Keep Alive) ---
+# --- Flask Server for Render ---
 app_server = Flask('')
 @app_server.route('/')
 def home(): return "Bot is Running Successfully!"
@@ -28,57 +28,58 @@ P3 = "AgACAgUAAxkBAAMhafNP-vnpRfYxNNtCover7Uq46jYAAjcSaxsmVplX6CwxVMWINnMACAEAAw
 
 app = Client("jaw_code_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-# --- Auto Delete Logic (120 Seconds) ---
-async def auto_delete(messages):
-    await asyncio.sleep(120)
+# --- Auto Delete Logic ---
+async def delayed_delete(messages, delay):
+    await asyncio.sleep(delay)
     for msg in messages:
         try: await msg.delete()
         except: pass
 
-# --- Join Request Handler (Grouped Media & Encoded Link) ---
+# --- Join Request Handler ---
 @app.on_chat_join_request()
 async def join_req(client, request: ChatJoinRequest):
     user = request.from_user
     name = f"@{user.username}" if user.username else user.first_name
     
-    # + symbol ko %2B me convert kiya gaya hai taaki link sahi share ho
+    # Share Link Fixed (%2B for +)
     btns = InlineKeyboardMarkup([
         [InlineKeyboardButton("𝗦𝗛𝗔𝗥𝗘 - 𝟬/𝟭", url="https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2BsUs1C78-PURmYmRl")],
         [InlineKeyboardButton("𝗦𝗞𝗜𝗣 𝗦𝗛𝗔𝗥𝗘", callback_data="start_msg")]
     ])
     
-    # Dono videos ko ek sath album bana kar bhejna
-    media = await client.send_media_group(user.id, [
-        InputMediaVideo(V1), 
-        InputMediaVideo(V2)
-    ])
-    
+    # Videos Group (Barabar me)
+    media_vids = await client.send_media_group(user.id, [InputMediaVideo(V1), InputMediaVideo(V2)])
+    # Text Message
     msg_text = await client.send_message(
         user.id, 
         f"{name}\nNO ACCESS CHANELL!\n\nYOU CAN FIX IT 😏\n\nSHARE TO 2 GROUPS TO OPEN\n-- 0/2 (61.625 + VID) --", 
         reply_markup=btns
     )
     
-    asyncio.create_task(auto_delete(list(media) + [msg_text]))
+    # Video 1 min (60s) baad delete
+    asyncio.create_task(delayed_delete(list(media_vids), 60))
+    # Text 2 min (120s) baad delete
+    asyncio.create_task(delayed_delete([msg_text], 120))
 
-# --- Start Command Logic (Grouped Photos) ---
+# --- Start Content Logic ---
 async def send_start_content(client, chat_id):
     btns = InlineKeyboardMarkup([[InlineKeyboardButton("Waiting for u daddy❤️💕", callback_data="buy")]])
     
-    # Teeno photos ko ek sath grid me bhejna
-    media = await client.send_media_group(chat_id, [
+    # Photos Group (Barabar me)
+    media_photos = await client.send_media_group(chat_id, [
         InputMediaPhoto(P1),
         InputMediaPhoto(P2),
         InputMediaPhoto(P3)
     ])
-    
+    # Text Message
     msg_text = await client.send_message(
         chat_id, 
         "Full anonymity of payment and purchase\nLifetime Subscription\nGlobal Access - 1000 stars ⭐️\n\nJoin: https://t.me/+Qi4QrqampEk4MWU9", 
         reply_markup=btns
     )
     
-    asyncio.create_task(auto_delete(list(media) + [msg_text]))
+    # Photos and Text dono 2 min (120s) baad delete
+    asyncio.create_task(delayed_delete(list(media_photos) + [msg_text], 120))
 
 @app.on_message(filters.command("start") & filters.private)
 async def start(client, message):
@@ -94,7 +95,5 @@ async def cb(client, callback):
 
 if __name__ == "__main__":
     Thread(target=run_flask).start()
-    print("✅ BOT IS LIVE: Grouped Media & Fixed Links!")
+    print("✅ BOT IS LIVE: Grouped Media & Custom Delete Timers!")
     app.run()
-
-
