@@ -15,10 +15,10 @@ def run():
     app_server.run(host='0.0.0.0', port=os.environ.get('PORT', 8080))
 
 # --- 2. अपनी डिटेल्स यहाँ भरें ---
-API_ID = 1234567               # अपना API ID यहाँ लिखें
-API_HASH = "your_hash"         # अपना API Hash यहाँ लिखें
-BOT_TOKEN = "your_token"       # अपना बॉट टोकन यहाँ लिखें
-CHANNEL_LINK = "https://t.me/your_channel" # चैनल लिंक
+API_ID = 39834295               # अपना API ID यहाँ लिखें
+API_HASH = "0a904deff6494ef8d2369afdcb9c3991"         # अपना API Hash यहाँ लिखें
+BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"       # अपना बॉट टोकन यहाँ लिखें
+CHANNEL_LINK = "https://t.me/+sUs1C78-PURmYmRl" # चैनल लिंक
 
 # --- 3. फाइल ID (अभी खाली छोड़ दें, बाद में Logs से निकालकर यहाँ भरें) ---
 VIDEO_1 = "ID_AAYEGI_YAHA"
