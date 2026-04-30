@@ -1,27 +1,70 @@
-  import os
-from pyrogram import Client, filters
-from flask import Flask
+  import asyncio
+import os
 from threading import Thread
+from flask import Flask
+from pyrogram import Client, filters, idle
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest
 
-# रेंडर को शांत रखने के लिए Flask
+# --- Flask Server for Render ---
 app_server = Flask('')
 @app_server.route('/')
-def home(): return "ID Bot is Running!"
+def home(): return "Bot is Running!"
 
 def run_flask():
-    app_server.run(host='0.0.0.0', port=int(os.environ.get("PORT", 10000)))
+    port = int(os.environ.get("PORT", 10000))
+    app_server.run(host='0.0.0.0', port=port)
 
-# आपकी डिटेल्स
+# --- Your Credentials ---
 API_ID = 39834295
 API_HASH = "0a904deff6494ef8d2369afdcb9c3991"
 BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"
 
-app = Client("id_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+# --- Paste Your IDs Here ---
+V1 = "BAACAgIAAxkBAAIFiGZInh8l8m_v7_7_7_7_7_7_7_7" # अपनी आईडी डालें
+V2 = "BAACAgIAAxkBAAIFimZInh8l8m_v7_7_7_7_7_7_7_7" 
+P1 = "AgACAgIAAxkBAAIFjGZInh8l8m_v7_7_7_7_7_7_7_7"
+P2 = "AgACAgIAAxkBAAIFjmZInh8l8m_v7_7_7_7_7_7_7_7"
+P3 = "AgACAgIAAxkBAAIFkGZInh8l8m_v7_7_7_7_7_7_7_7"
 
-@app.on_message(filters.video | filters.photo)
-async def get_id(client, message):
-    file_id = message.video.file_id if message.video else message.photo.file_id
-    await message.reply_text(f"FILE ID:\n\n`{file_id}`")
+app = Client("jaw_code_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
+async def auto_delete(messages):
+    await asyncio.sleep(120) # 2 मिनट
+    for msg in messages:
+        try: await msg.delete()
+        except: pass
+
+@app.on_chat_join_request()
+async def join_req(client, request: ChatJoinRequest):
+    user = request.from_user
+    name = f"@{user.username}" if user.username else user.first_name
+    btns = InlineKeyboardMarkup([
+        [InlineKeyboardButton("𝗦𝗛𝗔𝗥𝗘 - 𝟬/𝟭", url="https://t.me/share/url?url=https://t.me/+sUs1C78-PURmYmRl")],
+        [InlineKeyboardButton("𝗦𝗞𝗜𝗣 𝗦𝗛𝗔𝗥𝗘", callback_data="start_msg")]
+    ])
+    msg1 = await client.send_video(user.id, V1)
+    msg2 = await client.send_video(user.id, V2)
+    msg3 = await client.send_message(user.id, f"{name}\nNO ACCESS CHANELL!\n\nYOU CAN FIX IT 😏\n\nSHARE TO 2 GROUPS TO OPEN\n-- 0/2 (61.625 + VID) --", reply_markup=btns)
+    asyncio.create_task(auto_delete([msg1, msg2, msg3]))
+
+async def send_start_content(client, chat_id):
+    btns = InlineKeyboardMarkup([[InlineKeyboardButton("Waiting for u daddy❤️💕", callback_data="buy")]])
+    m1 = await client.send_photo(chat_id, P1)
+    m2 = await client.send_photo(chat_id, P2)
+    m3 = await client.send_photo(chat_id, P3)
+    m4 = await client.send_message(chat_id, "Full anonymity of payment and purchase\nLifetime Subscription\nGlobal Access - 1000 stars ⭐️\n\nJoin: https://t.me/+Qi4QrqampEk4MWU9", reply_markup=btns)
+    asyncio.create_task(auto_delete([m1, m2, m3, m4]))
+
+@app.on_message(filters.command("start") & filters.private)
+async def start(client, message):
+    await send_start_content(client, message.chat.id)
+
+@app.on_callback_query()
+async def cb(client, callback):
+    if callback.data == "start_msg":
+        await send_start_content(client, callback.message.chat.id)
+    elif callback.data == "buy":
+        await callback.answer("Buy it daddy i m waiting for u", show_alert=True)
 
 if __name__ == "__main__":
     Thread(target=run_flask).start()
