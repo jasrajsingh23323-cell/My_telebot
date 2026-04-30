@@ -3,9 +3,9 @@ import os
 from threading import Thread
 from flask import Flask
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest, InputMediaVideo, InputMediaPhoto
 
-# --- Flask Server for Render (24/7 Active) ---
+# --- Flask Server for Render ---
 app_server = Flask('')
 @app_server.route('/')
 def home(): return "Bot is Running Successfully!"
@@ -19,7 +19,7 @@ API_ID = 39834295
 API_HASH = "0a904deff6494ef8d2369afdcb9c3991"
 BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"
 
-# --- Your Verified File IDs (No More ValueErrors!) ---
+# --- Your Verified File IDs ---
 V1 = "BAACAgUAAxkBAAMdafNPIdzKw7p04qRCljadZcIUOycAAhIgAALcd3hXXocnTnbPkA8eBA"
 V2 = "BAACAgUAAxkBAAMeafNPfeCTxoiipcua_h1YKRkXrnMAAhMgAALcd3hXlFBfMa2jQMUeBA"
 P1 = "AgACAgUAAxkBAAMfafNPsLYP5rgjVeBWCRC1eI2Yi-UAAjYSaxsmVplX4dWyKUtAH1sACAEAAwIAA3kABx4E"
@@ -28,14 +28,14 @@ P3 = "AgACAgUAAxkBAAMhafNP-vnpRfYxNNtCover7Uq46jYAAjcSaxsmVplX6CwxVMWINnMACAEAAw
 
 app = Client("jaw_code_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-# --- Auto Delete Logic (120 Seconds) ---
+# --- Auto Delete Logic ---
 async def auto_delete(messages):
     await asyncio.sleep(120)
     for msg in messages:
         try: await msg.delete()
         except: pass
 
-# --- Join Request Handler ---
+# --- Join Request Handler (Grouped Videos) ---
 @app.on_chat_join_request()
 async def join_req(client, request: ChatJoinRequest):
     user = request.from_user
@@ -44,19 +44,37 @@ async def join_req(client, request: ChatJoinRequest):
         [InlineKeyboardButton("𝗦𝗛𝗔𝗥𝗘 - 𝟬/𝟭", url="https://t.me/share/url?url=https://t.me/+sUs1C78-PURmYmRl")],
         [InlineKeyboardButton("𝗦𝗞𝗜𝗣 𝗦𝗛𝗔𝗥𝗘", callback_data="start_msg")]
     ])
-    msg1 = await client.send_video(user.id, V1)
-    msg2 = await client.send_video(user.id, V2)
-    msg3 = await client.send_message(user.id, f"{name}\nNO ACCESS CHANELL!\n\nYOU CAN FIX IT 😏\n\nSHARE TO 2 GROUPS TO OPEN\n-- 0/2 (61.625 + VID) --", reply_markup=btns)
-    asyncio.create_task(auto_delete([msg1, msg2, msg3]))
+    
+    # Dono videos ko ek sath barabar bhejna
+    media = await client.send_media_group(user.id, [InputMediaVideo(V1), InputMediaVideo(V2)])
+    
+    msg_text = await client.send_message(
+        user.id, 
+        f"{name}\nNO ACCESS CHANELL!\n\nYOU CAN FIX IT 😏\n\nSHARE TO 2 GROUPS TO OPEN\n-- 0/2 (61.625 + VID) --", 
+        reply_markup=btns
+    )
+    
+    # Sabko delete list me dalna
+    asyncio.create_task(auto_delete(list(media) + [msg_text]))
 
-# --- Start Command Logic ---
+# --- Start Command Logic (Grouped Photos) ---
 async def send_start_content(client, chat_id):
     btns = InlineKeyboardMarkup([[InlineKeyboardButton("Waiting for u daddy❤️💕", callback_data="buy")]])
-    m1 = await client.send_photo(chat_id, P1)
-    m2 = await client.send_photo(chat_id, P2)
-    m3 = await client.send_photo(chat_id, P3)
-    m4 = await client.send_message(chat_id, "Full anonymity of payment and purchase\nLifetime Subscription\nGlobal Access - 1000 stars ⭐️\n\nJoin: https://t.me/+Qi4QrqampEk4MWU9", reply_markup=btns)
-    asyncio.create_task(auto_delete([m1, m2, m3, m4]))
+    
+    # Teeno photos ko ek sath album bana kar bhejna
+    media = await client.send_media_group(chat_id, [
+        InputMediaPhoto(P1),
+        InputMediaPhoto(P2),
+        InputMediaPhoto(P3)
+    ])
+    
+    msg_text = await client.send_message(
+        chat_id, 
+        "Full anonymity of payment and purchase\nLifetime Subscription\nGlobal Access - 1000 stars ⭐️\n\nJoin: https://t.me/+Qi4QrqampEk4MWU9", 
+        reply_markup=btns
+    )
+    
+    asyncio.create_task(auto_delete(list(media) + [msg_text]))
 
 @app.on_message(filters.command("start") & filters.private)
 async def start(client, message):
@@ -72,5 +90,6 @@ async def cb(client, callback):
 
 if __name__ == "__main__":
     Thread(target=run_flask).start()
-    print("✅ BOT IS LIVE!")
+    print("✅ BOT IS LIVE WITH GROUPED MEDIA!")
     app.run()
+
