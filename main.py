@@ -58,4 +58,14 @@ async def main():
     await app.stop()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Flask को अलग थ्रेड में चलाएं
+    t = Thread(target=run_flask)
+    t.daemon = True
+    t.start()
+    
+    # बॉट चलाने का सबसे स्टेबल तरीका
+    try:
+        app.run()
+    except Exception as e:
+        print(f"Error: {e}")
+
