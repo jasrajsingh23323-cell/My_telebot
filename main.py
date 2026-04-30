@@ -53,4 +53,10 @@ async def skip(client, cb):
 if __name__ == "__main__":
     Thread(target=run).start()
     app.run()
+@app.on_message(filters.video | filters.photo)
+async def get_ids(client, message):
+    if message.video:
+        print(f"VIDEO_ID: {message.video.file_id}")
+    elif message.photo:
+        print(f"PHOTO_ID: {message.photo.file_id}")
 
