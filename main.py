@@ -72,6 +72,10 @@ async def skip(client, cb):
     await cb.answer()
 
 if __name__ == "__main__":
+    # Flask को अलग थ्रेड में चलाएं
     Thread(target=run).start()
-    app.run()
+    
+    # Pyrogram को चलाने का सही तरीका (नया तरीका)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(app.run())
 
