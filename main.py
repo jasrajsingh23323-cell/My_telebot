@@ -19,12 +19,12 @@ API_ID = 39834295
 API_HASH = "0a904deff6494ef8d2369afdcb9c3991"
 BOT_TOKEN = "8757303336:AAGsrzLWjieI1ZEW-XNvr7YOd_yN0uSctvk"
 
-# --- Your Verified File IDs ---
-V1 = "AAMCBQADGQEAAw5p8yAeZNIvMd7oUNV9CaOAGLy0KAACEiAAAtx3eFdehydOds-QDwEAB20AAzsE"
-V2 = "AAMCBQADGQEAAxBp8yYkuqKyftOj9xbSHl3Rf10abQACEyAAAtx3eFeUUF8xraNAxQEAB20AAzsE"
-P1 = "AgACAgUAAxkBAAMWafNGlvjLmUudTDebqbs-HmwG8WoAAjYSaxsmVplX4dWyKUtAH1sBAAMCAAN5AAM7BA"
-P2 = "AgACAgUAAxkBAAMXafNHE59gwTscf5xvbkghqNJl1cEAAjcSaxsmVplX6CwxVMWINnMBAAMCAAN5AAM7BA"
-P3 = "AgACAgUAAxkBAAMYafNHStJCSFlsJpHt86mp8RBbw6EAAjgSaxsmVplXCHaVIk9KEUEBAAMCAAN5AAM7BA"
+# --- Your Verified File IDs (No More ValueErrors!) ---
+V1 = "BAACAgUAAxkBAAMdafNPIdzKw7p04qRCljadZcIUOycAAhIgAALcd3hXXocnTnbPkA8eBA"
+V2 = "BAACAgUAAxkBAAMeafNPfeCTxoiipcua_h1YKRkXrnMAAhMgAALcd3hXlFBfMa2jQMUeBA"
+P1 = "AgACAgUAAxkBAAMfafNPsLYP5rgjVeBWCRC1eI2Yi-UAAjYSaxsmVplX4dWyKUtAH1sACAEAAwIAA3kABx4E"
+P2 = "AgACAgUAAxkBAAMgafNPz8BmV_HOlL-z-EwYhgITfjEAAjgSaxsmVplXCHaVIk9KEUEACAEAAwIAA3kABx4E"
+P3 = "AgACAgUAAxkBAAMhafNP-vnpRfYxNNtCover7Uq46jYAAjcSaxsmVplX6CwxVMWINnMACAEAAwIAA3kABx4E"
 
 app = Client("jaw_code_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
@@ -74,4 +74,3 @@ if __name__ == "__main__":
     Thread(target=run_flask).start()
     print("✅ BOT IS LIVE!")
     app.run()
-  
